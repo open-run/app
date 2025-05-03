@@ -1,15 +1,24 @@
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
-import {Text, View} from 'react-native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {RootStackParamList, RouteNames} from './routes';
+import HomeScreen from './screens/HomeScreen';
+import {WebViewProvider} from './components/WebViewProvider';
 
-const App = () => {
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
+export default function App() {
   return (
-    <NavigationContainer>
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <Text>Hello World</Text>
-      </View>
-    </NavigationContainer>
+    <WebViewProvider>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            name={RouteNames.HOME}
+            component={HomeScreen}
+            options={{headerShown: false}}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </WebViewProvider>
   );
-};
-
-export default App;
+}
