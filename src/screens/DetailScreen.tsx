@@ -1,18 +1,18 @@
-import React, {useRef} from 'react';
+import React, {useContext, useRef} from 'react';
 import WebView, {WebViewMessageEvent} from 'react-native-webview';
 import {View, StyleSheet} from 'react-native';
 import {requestGeolocation} from '../utils/geolocation';
 import {Message} from '../constants/message';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {RootStackParamList, RouteNames} from '../../routes';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {RootStackParamList} from '../../routes';
 import {URL} from '../constants';
+import {WebViewContext} from '../components/WebViewProvider';
 
-type Props = NativeStackNavigationProp<RootStackParamList>;
+type Props = NativeStackScreenProps<RootStackParamList, 'detail'>;
 
-export default function HomeScreen() {
-  const navigation = useNavigation<Props>();
-  // const context = useContext(WebViewContext);
+export default function DetailScreen({route, navigation}: Props) {
+  const {initialUrl} = route.params;
+  const context = useContext(WebViewContext);
   const webViewRef = useRef<WebView>(null);
 
   const onMessage = async (event: WebViewMessageEvent) => {
@@ -45,8 +45,13 @@ export default function HomeScreen() {
   return (
     <View style={styles.safearea}>
       <WebView
-        ref={webViewRef}
-        source={{uri: URL}}
+        ref={ref => {
+          (webViewRef as React.MutableRefObject<WebView | null>).current = ref;
+          if (ref != null) {
+            context?.addWebView(ref);
+          }
+        }}
+        source={{uri: initialUrl}}
         webviewDebuggingEnabled
         geolocationEnabled
         javaScriptEnabled
@@ -55,17 +60,14 @@ export default function HomeScreen() {
         mixedContentMode="always"
         onMessage={onMessage}
         onShouldStartLoadWithRequest={request => {
-          if (request.url.includes('/bung')) {
-            navigation.navigate(RouteNames.DETAIL, {
-              initialUrl: request.url,
-            });
-            return false;
-          }
+          if (request.url === URL || request.mainDocumentURL === URL) {
+            if (context?.webViewRefs.current != null) {
+              context.webViewRefs.current.forEach(webView => {
+                webView.reload();
+              });
+            }
 
-          if (request.url.includes('/avatar')) {
-            navigation.navigate(RouteNames.AVATAR, {
-              initialUrl: request.url,
-            });
+            navigation.goBack();
             return false;
           }
 
