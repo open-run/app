@@ -1,12 +1,12 @@
 import React, {useContext, useRef} from 'react';
-import WebView, {WebViewMessageEvent} from 'react-native-webview';
 import {View, StyleSheet} from 'react-native';
-import {requestGeolocation} from '../utils/geolocation';
-import {Message} from '../constants/message';
+import WebView, {WebViewMessageEvent} from 'react-native-webview';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {RootStackParamList} from '../../routes';
-import {URL} from '../constants';
-import {WebViewContext} from '../components/WebViewProvider';
+import {WebViewContext} from '@components/WebViewProvider';
+import {requestGeolocation} from '@utils/geolocation';
+import {Message} from '@constants/message';
+import {URL} from '@constants/index';
+import {RootStackParamList} from '../routes';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'detail'>;
 

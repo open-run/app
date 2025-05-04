@@ -1,10 +1,10 @@
 import React, {useContext} from 'react';
-import WebView from 'react-native-webview';
 import {View, StyleSheet} from 'react-native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {RootStackParamList} from '../../routes';
-import {URL} from '../constants';
-import {WebViewContext} from '../components/WebViewProvider';
+import WebView from 'react-native-webview';
+import {WebViewContext} from '@components/WebViewProvider';
+import {URL} from '@constants/index';
+import {RootStackParamList} from '../routes';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'avatar'>;
 

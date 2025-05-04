@@ -1,6 +1,6 @@
-import Geolocation from '@react-native-community/geolocation';
 import {Platform} from 'react-native';
 import {request, PERMISSIONS, RESULTS} from 'react-native-permissions';
+import Geolocation from '@react-native-community/geolocation';
 
 type Location = {
   lat: number;

@@ -1,13 +1,13 @@
 import React from 'react';
+import {Platform, StatusBar} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {RootStackParamList, RouteNames} from './routes';
-import {WebViewProvider} from './src/components/WebViewProvider';
-import HomeScreen from './src/screens/HomeScreen';
-import DetailScreen from './src/screens/DetailScreen';
-import AvatarScreen from './src/screens/AvatarScreen';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {Platform, StatusBar} from 'react-native';
+import HomeScreen from '@screens/HomeScreen';
+import DetailScreen from '@screens/DetailScreen';
+import AvatarScreen from '@screens/AvatarScreen';
+import {WebViewProvider} from '@components/WebViewProvider';
+import {RootStackParamList, RouteNames} from './src/routes';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 

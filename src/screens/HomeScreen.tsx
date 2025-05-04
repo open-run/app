@@ -1,12 +1,12 @@
 import React, {useRef} from 'react';
 import WebView, {WebViewMessageEvent} from 'react-native-webview';
 import {View, StyleSheet} from 'react-native';
-import {requestGeolocation} from '../utils/geolocation';
-import {Message} from '../constants/message';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {RootStackParamList, RouteNames} from '../../routes';
-import {URL} from '../constants';
+import {requestGeolocation} from '@utils/geolocation';
+import {Message} from '@constants/message';
+import {URL} from '@constants/index';
+import {RootStackParamList, RouteNames} from '../routes';
 
 type Props = NativeStackNavigationProp<RootStackParamList>;
 
@@ -17,7 +17,6 @@ export default function HomeScreen() {
 
   const onMessage = async (event: WebViewMessageEvent) => {
     const data = JSON.parse(event.nativeEvent.data);
-    console.log('ryong', data);
     if (data.type === Message.REQUEST_GEOLOCATION) {
       const location = await requestGeolocation();
       console.log('GEOLOCATION', location);
