@@ -1,7 +1,7 @@
 import React, {useContext, useRef} from 'react';
-import {View, StyleSheet} from 'react-native';
 import WebView, {WebViewMessageEvent} from 'react-native-webview';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import Layout from '@components/Layout';
 import {WebViewContext} from '@components/WebViewProvider';
 import {requestGeolocation} from '@utils/geolocation';
 import {Message} from '@constants/message';
@@ -17,7 +17,6 @@ export default function DetailScreen({route, navigation}: Props) {
 
   const onMessage = async (event: WebViewMessageEvent) => {
     const data = JSON.parse(event.nativeEvent.data);
-    console.log('ryong', data);
     if (data.type === Message.REQUEST_GEOLOCATION) {
       const location = await requestGeolocation();
       console.log('GEOLOCATION', location);
@@ -43,7 +42,7 @@ export default function DetailScreen({route, navigation}: Props) {
   };
 
   return (
-    <View style={styles.safearea}>
+    <Layout>
       <WebView
         ref={ref => {
           (webViewRef as React.MutableRefObject<WebView | null>).current = ref;
@@ -74,10 +73,6 @@ export default function DetailScreen({route, navigation}: Props) {
           return true;
         }}
       />
-    </View>
+    </Layout>
   );
 }
-
-const styles = StyleSheet.create({
-  safearea: {flex: 1}, // 전체 화면으로 만들기
-});

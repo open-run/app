@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
-import {View, StyleSheet} from 'react-native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import WebView from 'react-native-webview';
+import Layout from '@components/Layout';
 import {WebViewContext} from '@components/WebViewProvider';
 import {URL} from '@constants/index';
 import {RootStackParamList} from '../routes';
@@ -13,7 +13,7 @@ export default function AvatarScreen({route, navigation}: Props) {
   const context = useContext(WebViewContext);
 
   return (
-    <View style={styles.safearea}>
+    <Layout>
       <WebView
         ref={ref => {
           if (ref != null) {
@@ -42,10 +42,6 @@ export default function AvatarScreen({route, navigation}: Props) {
           return true;
         }}
       />
-    </View>
+    </Layout>
   );
 }
-
-const styles = StyleSheet.create({
-  safearea: {flex: 1}, // 전체 화면으로 만들기
-});

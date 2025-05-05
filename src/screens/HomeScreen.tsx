@@ -1,8 +1,8 @@
 import React, {useRef} from 'react';
 import WebView, {WebViewMessageEvent} from 'react-native-webview';
-import {View, StyleSheet} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import Layout from '@components/Layout';
 import {requestGeolocation} from '@utils/geolocation';
 import {Message} from '@constants/message';
 import {URL} from '@constants/index';
@@ -12,7 +12,6 @@ type Props = NativeStackNavigationProp<RootStackParamList>;
 
 export default function HomeScreen() {
   const navigation = useNavigation<Props>();
-  // const context = useContext(WebViewContext);
   const webViewRef = useRef<WebView>(null);
 
   const onMessage = async (event: WebViewMessageEvent) => {
@@ -42,7 +41,7 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={styles.safearea}>
+    <Layout>
       <WebView
         ref={webViewRef}
         source={{uri: URL}}
@@ -71,10 +70,6 @@ export default function HomeScreen() {
           return true;
         }}
       />
-    </View>
+    </Layout>
   );
 }
-
-const styles = StyleSheet.create({
-  safearea: {flex: 1}, // 전체 화면으로 만들기
-});
