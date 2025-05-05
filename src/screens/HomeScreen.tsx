@@ -6,6 +6,7 @@ import Layout from '@components/Layout';
 import {requestGeolocation} from '@utils/geolocation';
 import {Message} from '@constants/message';
 import {URL} from '@constants/index';
+import {log} from '@utils/log';
 import {RootStackParamList, RouteNames} from '../routes';
 
 type Props = NativeStackNavigationProp<RootStackParamList>;
@@ -18,7 +19,7 @@ export default function HomeScreen() {
     const data = JSON.parse(event.nativeEvent.data);
     if (data.type === Message.REQUEST_GEOLOCATION) {
       const location = await requestGeolocation();
-      console.log('GEOLOCATION', location);
+      log('Geolocation', location);
       if (location) {
         webViewRef.current?.postMessage(
           JSON.stringify({
