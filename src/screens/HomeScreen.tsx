@@ -48,8 +48,6 @@ export default function HomeScreen() {
         source={{uri: URL}}
         webviewDebuggingEnabled
         geolocationEnabled
-        javaScriptEnabled
-        domStorageEnabled
         originWhitelist={['*']}
         mixedContentMode="always"
         onMessage={onMessage}

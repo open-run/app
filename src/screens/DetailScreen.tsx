@@ -54,8 +54,6 @@ export default function DetailScreen({route, navigation}: Props) {
         source={{uri: initialUrl}}
         webviewDebuggingEnabled
         geolocationEnabled
-        javaScriptEnabled
-        domStorageEnabled
         originWhitelist={['*']}
         mixedContentMode="always"
         onMessage={onMessage}

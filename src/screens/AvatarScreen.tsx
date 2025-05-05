@@ -22,9 +22,6 @@ export default function AvatarScreen({route, navigation}: Props) {
         }}
         source={{uri: initialUrl}}
         webviewDebuggingEnabled
-        geolocationEnabled
-        javaScriptEnabled
-        domStorageEnabled
         originWhitelist={['*']}
         mixedContentMode="always"
         onShouldStartLoadWithRequest={request => {
