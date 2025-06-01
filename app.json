@@ -7,6 +7,19 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "scheme": "openrunexpo",
+    "experiments": {
+      "tsconfigPaths": true
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "앱이 위치 정보를 사용하여 주변 정보를 제공합니다."
+        }
+      ]
+    ],
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -24,6 +37,9 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "ONCHAINKIT_API_KEY": "AIzaSyDEYLiAvcL-MChUfadGX8UvVRHBUBpp040"
     }
   }
 }
