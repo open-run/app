@@ -26,13 +26,8 @@ export function useSmartWallet() {
     []
   );
 
-  const disconnectWallet = useCallback((onSuccess?: () => void) => {
-    disconnect(
-      { connector: connectors[0] },
-      {
-        onSuccess,
-      }
-    );
+  const disconnectWallet = useCallback(() => {
+    disconnect({ connector: connectors[0] });
   }, []);
 
   return { address, connectWallet, disconnectWallet };

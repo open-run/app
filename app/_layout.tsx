@@ -1,6 +1,5 @@
-import { polyfillWebCrypto } from "expo-standard-web-crypto";
-import { randomUUID } from "expo-crypto";
-import { StatusBar } from "expo-status-bar";
+import "../polyfills";
+
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createConfig, createStorage, http, WagmiProvider } from "wagmi";
@@ -13,8 +12,6 @@ import * as Linking from "expo-linking";
 import { WebViewProvider } from "@components/WebViewProvider";
 
 polyfillForWagmi();
-polyfillWebCrypto();
-crypto.randomUUID = randomUUID as any;
 
 const PREFIX_URL = Linking.createURL("/");
 
@@ -55,7 +52,6 @@ export default function Layout() {
           </WebViewProvider>
         </QueryClientProvider>
       </WagmiProvider>
-      <StatusBar style="dark" />
     </SafeAreaProvider>
   );
 }

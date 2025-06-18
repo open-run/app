@@ -23,15 +23,6 @@ export default function HomeScreen() {
   const onMessage = async (event: WebViewMessageEvent) => {
     const data = JSON.parse(event.nativeEvent.data);
     switch (data.type) {
-      /* 스마트월렛 연결 여부 확인 */
-      case Message.REQUEST_CHECK_WALLET_CONNECTED:
-        log("REQUEST_CHECK_WALLET_CONNECTED");
-        postMessage({
-          type: Message.RESPONSE_CHECK_WALLET_CONNECTED,
-          data: !!address,
-        });
-        break;
-
       /* 스마트월렛 연결 */
       case Message.REQUEST_SMART_WALLET_CONNECT:
         log("REQUEST_SMART_WALLET_CONNECT");
@@ -64,12 +55,7 @@ export default function HomeScreen() {
       /* 스마트월렛 연결 해제 */
       case Message.DISCONNECT_SMART_WALLET:
         log("DISCONNECT_SMART_WALLET");
-        disconnectWallet(() => {
-          postMessage({
-            type: Message.RESPONSE_CHECK_WALLET_CONNECTED,
-            data: !!address,
-          });
-        });
+        address && disconnectWallet();
         break;
 
       case Message.REQUEST_GEOLOCATION:
