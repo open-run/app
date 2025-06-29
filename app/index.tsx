@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { View, ActivityIndicator, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import WebView, { WebViewMessageEvent } from "react-native-webview";
@@ -8,9 +8,11 @@ import { Message } from "@constants/message";
 import { URL } from "@constants/index";
 import { log } from "@utils/log";
 import { useSmartWallet } from "@hooks/useSmartWallet";
+import { WebViewContext } from "@components/WebViewProvider";
 
 export default function HomeScreen() {
   const router = useRouter();
+  const context = useContext(WebViewContext);
   const { address, connectWallet, disconnectWallet } = useSmartWallet();
   const webViewRef = useRef<WebView>(null);
   const [isWebViewLoaded, setIsWebViewLoaded] = useState(false);
@@ -88,7 +90,12 @@ export default function HomeScreen() {
         </View>
       )}
       <WebView
-        ref={webViewRef}
+        ref={(ref) => {
+          webViewRef.current = ref;
+          if (ref != null) {
+            context?.addWebView(ref);
+          }
+        }}
         source={{ uri: URL }}
         webviewDebuggingEnabled
         geolocationEnabled
@@ -98,6 +105,8 @@ export default function HomeScreen() {
         onLoadEnd={() => {
           setIsWebViewLoaded(true);
         }}
+        bounces={false}
+        overScrollMode="never"
         onShouldStartLoadWithRequest={(request) => {
           console.log("request.url", request.url);
           if (request.url.includes("/bung")) {
