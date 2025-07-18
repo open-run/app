@@ -46,8 +46,6 @@ export default function Layout() {
           <WebViewProvider>
             <Stack>
               <Stack.Screen name="index" options={{ headerShown: false }} />
-              <Stack.Screen name="bung" options={{ headerShown: false }} />
-              <Stack.Screen name="avatar" options={{ headerShown: false }} />
             </Stack>
           </WebViewProvider>
         </QueryClientProvider>

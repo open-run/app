@@ -1,6 +1,5 @@
 import React, { useContext, useRef, useState } from "react";
 import { View, ActivityIndicator, StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
 import WebView, { WebViewMessageEvent } from "react-native-webview";
 import Layout from "@components/Layout";
 import { requestGeolocation } from "@utils/geolocation";
@@ -11,7 +10,6 @@ import { useSmartWallet } from "@hooks/useSmartWallet";
 import { WebViewContext } from "@components/WebViewProvider";
 
 export default function HomeScreen() {
-  const router = useRouter();
   const context = useContext(WebViewContext);
   const { address, connectWallet, disconnectWallet } = useSmartWallet();
   const webViewRef = useRef<WebView>(null);
@@ -105,28 +103,9 @@ export default function HomeScreen() {
         onLoadEnd={() => {
           setIsWebViewLoaded(true);
         }}
+        allowsBackForwardNavigationGestures={true}
         bounces={false}
         overScrollMode="never"
-        onShouldStartLoadWithRequest={(request) => {
-          console.log("request.url", request.url);
-          if (request.url.includes("/bung")) {
-            router.push({
-              pathname: "/bung",
-              params: { initialUrl: request.url },
-            });
-            return false;
-          }
-
-          if (request.url.includes("/avatar")) {
-            router.push({
-              pathname: "/avatar",
-              params: { initialUrl: request.url },
-            });
-            return false;
-          }
-
-          return true;
-        }}
       />
     </Layout>
   );
