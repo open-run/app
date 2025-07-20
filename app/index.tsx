@@ -1,19 +1,15 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useRef } from "react";
 import { View, ActivityIndicator, StyleSheet } from "react-native";
 import WebView, { WebViewMessageEvent } from "react-native-webview";
-import Layout from "@components/Layout";
 import { requestGeolocation } from "@utils/geolocation";
 import { Message } from "@constants/message";
 import { URL } from "@constants/index";
 import { log } from "@utils/log";
 import { useSmartWallet } from "@hooks/useSmartWallet";
-import { WebViewContext } from "@components/WebViewProvider";
 
 export default function HomeScreen() {
-  const context = useContext(WebViewContext);
   const { address, connectWallet, disconnectWallet } = useSmartWallet();
   const webViewRef = useRef<WebView>(null);
-  const [isWebViewLoaded, setIsWebViewLoaded] = useState(false);
 
   const postMessage = (message: any) => {
     log("POST MESSAGE TO WEBVIEW", message);
@@ -81,37 +77,28 @@ export default function HomeScreen() {
   };
 
   return (
-    <Layout>
-      {!isWebViewLoaded && (
-        <View style={styles.splashContainer}>
-          <ActivityIndicator size="large" color="#4A5CEF" />
-        </View>
-      )}
+    <View style={styles.safearea}>
       <WebView
-        ref={(ref) => {
-          webViewRef.current = ref;
-          if (ref != null) {
-            context?.addWebView(ref);
-          }
-        }}
+        ref={webViewRef}
         source={{ uri: URL }}
-        webviewDebuggingEnabled
         geolocationEnabled
         originWhitelist={["*"]}
         mixedContentMode="always"
         onMessage={onMessage}
-        onLoadEnd={() => {
-          setIsWebViewLoaded(true);
-        }}
-        allowsBackForwardNavigationGestures={true}
+        startInLoadingState
+        renderLoading={() => <></>}
+        allowsBackForwardNavigationGestures
         bounces={false}
         overScrollMode="never"
+        allowsLinkPreview={false}
+        webviewDebuggingEnabled
       />
-    </Layout>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  safearea: { flex: 1 }, // 전체 화면으로 만들기
   splashContainer: {
     position: "absolute",
     top: 0,

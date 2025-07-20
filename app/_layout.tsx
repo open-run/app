@@ -9,7 +9,6 @@ import { base, baseSepolia } from "wagmi/chains";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createConnectorFromWallet, Wallets } from "@mobile-wallet-protocol/wagmi-connectors";
 import * as Linking from "expo-linking";
-import { WebViewProvider } from "@components/WebViewProvider";
 
 polyfillForWagmi();
 
@@ -43,11 +42,9 @@ export default function Layout() {
     <SafeAreaProvider>
       <WagmiProvider config={wagmiConfig}>
         <QueryClientProvider client={queryClient}>
-          <WebViewProvider>
-            <Stack>
-              <Stack.Screen name="index" options={{ headerShown: false }} />
-            </Stack>
-          </WebViewProvider>
+          <Stack>
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+          </Stack>
         </QueryClientProvider>
       </WagmiProvider>
     </SafeAreaProvider>
