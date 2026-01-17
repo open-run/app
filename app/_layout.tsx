@@ -1,63 +1,30 @@
+import "@walletconnect/react-native-compat";
 import "../polyfills";
 
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createConfig, createStorage, http, WagmiProvider } from "wagmi";
 import React from "react";
 import { Stack } from "expo-router";
-import { base, baseSepolia } from "wagmi/chains";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { createConnectorFromWallet, Wallets } from "@mobile-wallet-protocol/wagmi-connectors";
-import * as Linking from "expo-linking";
-
-polyfillForWagmi();
-
-const PREFIX_URL = Linking.createURL("/");
-
-const wagmiConfig = createConfig({
-  chains: [base, baseSepolia],
-  connectors: [
-    createConnectorFromWallet({
-      metadata: {
-        name: "Open Run",
-        customScheme: PREFIX_URL,
-      },
-      wallet: Wallets.CoinbaseSmartWallet,
-    }),
-  ],
-  storage: createStorage({
-    storage: AsyncStorage,
-  }),
-  ssr: true,
-  transports: {
-    [base.id]: http(),
-    [baseSepolia.id]: http(),
-  },
-});
+import { AppKitProvider, AppKit } from "@reown/appkit-react-native";
+import { WagmiProvider } from "wagmi";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { appKit, wagmiConfig } from "../appKitConfig";
 
 const queryClient = new QueryClient();
 
 export default function Layout() {
   return (
     <SafeAreaProvider>
-      <WagmiProvider config={wagmiConfig}>
-        <QueryClientProvider client={queryClient}>
-          <Stack>
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-          </Stack>
-        </QueryClientProvider>
-      </WagmiProvider>
+      <AppKitProvider instance={appKit}>
+        {/* @ts-ignore - wagmi 버전 불일치로 인한 타입 에러 */}
+        <WagmiProvider config={wagmiConfig}>
+          <QueryClientProvider client={queryClient}>
+            <Stack>
+              <Stack.Screen name="index" options={{ headerShown: false }} />
+            </Stack>
+            <AppKit />
+          </QueryClientProvider>
+        </WagmiProvider>
+      </AppKitProvider>
     </SafeAreaProvider>
   );
-}
-
-function polyfillForWagmi() {
-  const noop = (() => {}) as any;
-
-  window.addEventListener = noop;
-  window.dispatchEvent = noop;
-  window.removeEventListener = noop;
-  window.CustomEvent = function CustomEvent() {
-    return {};
-  } as any;
 }

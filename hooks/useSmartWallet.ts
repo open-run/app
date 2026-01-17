@@ -1,34 +1,32 @@
 import { useCallback } from "react";
-import { Config, useAccount, useConnect, useDisconnect } from "wagmi";
-import { ConnectData } from "wagmi/query";
+import { useAppKit, useAccount } from "@reown/appkit-react-native";
 
 export function useSmartWallet() {
-  const { address } = useAccount();
-  const { connect, connectors } = useConnect();
-  const { disconnect } = useDisconnect();
+  const { open, disconnect } = useAppKit();
+  const { address, isConnected } = useAccount();
 
   const connectWallet = useCallback(
     ({
       onSuccess,
       onError,
     }: {
-      onSuccess?: (data: ConnectData<Config>) => void;
+      onSuccess?: (data: { accounts: string[] }) => void;
       onError?: (error: Error) => void;
     }) => {
-      connect(
-        { connector: connectors[0] },
-        {
-          onSuccess,
-          onError,
-        }
-      );
+      try {
+        // AppKit 모달 열기
+        // 연결 성공/실패는 index.tsx에서 useAccount를 통해 감지합니다
+        open();
+      } catch (error) {
+        onError?.(error as Error);
+      }
     },
-    []
+    [open]
   );
 
   const disconnectWallet = useCallback(() => {
-    disconnect({ connector: connectors[0] });
-  }, []);
+    disconnect();
+  }, [disconnect]);
 
-  return { address, connectWallet, disconnectWallet };
+  return { address, connectWallet, disconnectWallet, isConnected };
 }
