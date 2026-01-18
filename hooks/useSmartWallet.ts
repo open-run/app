@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { useAppKit, useAccount } from "@reown/appkit-react-native";
 
 export function useSmartWallet() {
-  const { open, disconnect } = useAppKit();
+  const { open, close, disconnect } = useAppKit();
   const { address, isConnected } = useAccount();
 
   const connectWallet = useCallback(
@@ -24,9 +24,17 @@ export function useSmartWallet() {
     [open]
   );
 
+  const closeWallet = useCallback(() => {
+    try {
+      close();
+    } catch (error) {
+      console.error("Failed to close wallet modal:", error);
+    }
+  }, [close]);
+
   const disconnectWallet = useCallback(() => {
     disconnect();
   }, [disconnect]);
 
-  return { address, connectWallet, disconnectWallet, isConnected };
+  return { address, connectWallet, closeWallet, disconnectWallet, isConnected };
 }
