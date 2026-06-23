@@ -5,7 +5,7 @@ import { useSmartWallet } from "@hooks/useSmartWallet";
 import { useWalletConnection } from "@hooks/useWalletConnection";
 import { useWebViewMessage } from "@hooks/useWebViewMessage";
 import { useWebViewInsets } from "@hooks/useWebViewInsets";
-import { DEFAULT_APP_URL } from "@constants/index";
+import { URL as WEB_APP_URL } from "@constants/index";
 import { log } from "@utils/log";
 
 export default function HomeScreen() {
@@ -47,7 +47,7 @@ export default function HomeScreen() {
   const onWebViewError = useCallback(
     (event: any) => {
       const description = event?.nativeEvent?.description ?? "알 수 없는 네트워크 에러";
-      const failingUrl = event?.nativeEvent?.url ?? DEFAULT_APP_URL;
+      const failingUrl = event?.nativeEvent?.url ?? WEB_APP_URL;
       const message = `로드 실패: ${description} (${failingUrl})`;
       setWebViewError(message);
       log("WEBVIEW_LOAD_ERROR", event?.nativeEvent);
@@ -57,7 +57,7 @@ export default function HomeScreen() {
 
   const onWebViewHttpError = useCallback((event: any) => {
     const statusCode = event?.nativeEvent?.statusCode;
-    const failingUrl = event?.nativeEvent?.url ?? DEFAULT_APP_URL;
+    const failingUrl = event?.nativeEvent?.url ?? WEB_APP_URL;
     const message = `HTTP ${statusCode ?? "?"} 에러 (${failingUrl})`;
     setWebViewError(message);
     log("WEBVIEW_HTTP_ERROR", event?.nativeEvent);
@@ -66,9 +66,9 @@ export default function HomeScreen() {
   return (
     <View style={styles.safearea}>
       <WebView
-        key={DEFAULT_APP_URL}
+        key={WEB_APP_URL}
         ref={webViewRef}
-        source={{ uri: DEFAULT_APP_URL }}
+        source={{ uri: WEB_APP_URL }}
         geolocationEnabled
         originWhitelist={["*"]}
         mixedContentMode="always"
