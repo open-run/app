@@ -83,7 +83,7 @@ export default function HomeScreen() {
         bounces={false}
         overScrollMode="never"
         allowsLinkPreview={false}
-        webviewDebuggingEnabled
+        webviewDebuggingEnabled={__DEV__}
       />
 
       {webViewError ? (
