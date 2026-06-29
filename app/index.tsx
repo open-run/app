@@ -1,6 +1,7 @@
 import React, { useCallback, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import WebView from "react-native-webview";
+import { StatusBar, type StatusBarStyle } from "expo-status-bar";
 import { useSmartWallet } from "@hooks/useSmartWallet";
 import { useWalletConnection } from "@hooks/useWalletConnection";
 import { useWebViewMessage } from "@hooks/useWebViewMessage";
@@ -8,10 +9,13 @@ import { useWebViewInsets } from "@hooks/useWebViewInsets";
 import { URL as WEB_APP_URL } from "@constants/index";
 import { log } from "@utils/log";
 
+type WebStatusBarStyle = Extract<StatusBarStyle, "light" | "dark">;
+
 export default function HomeScreen() {
   const { disconnectWallet } = useSmartWallet();
   const webViewRef = useRef<WebView>(null);
   const [webViewError, setWebViewError] = useState<string | null>(null);
+  const [statusBarStyle, setStatusBarStyle] = useState<WebStatusBarStyle>("dark");
 
   const postMessage = (message: any) => {
     log("POST MESSAGE TO WEBVIEW", message);
@@ -24,6 +28,7 @@ export default function HomeScreen() {
     disconnectWallet,
     handleConnectRequest,
     postMessage,
+    setStatusBarStyle,
   });
   const { handleLoadEnd } = useWebViewInsets({ postMessage });
 
@@ -65,6 +70,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.safearea}>
+      <StatusBar style={statusBarStyle} translucent backgroundColor="transparent" />
       <WebView
         key={WEB_APP_URL}
         ref={webViewRef}

@@ -5,11 +5,18 @@ import { executeVibration } from "@utils/vibration";
 import { Message, VibrationType } from "@constants/message";
 import { log } from "@utils/log";
 
+type BridgeStatusBarStyle = "light" | "dark";
+
+const isBridgeStatusBarStyle = (style: unknown): style is BridgeStatusBarStyle => {
+  return style === "light" || style === "dark";
+};
+
 interface UseWebViewMessageProps {
   address: string | undefined;
   disconnectWallet: () => void;
   handleConnectRequest: () => void;
   postMessage: (message: any) => void;
+  setStatusBarStyle: (style: BridgeStatusBarStyle) => void;
 }
 
 /**
@@ -20,6 +27,7 @@ export function useWebViewMessage({
   disconnectWallet,
   handleConnectRequest,
   postMessage,
+  setStatusBarStyle,
 }: UseWebViewMessageProps) {
   const handleMessage = useCallback(
     async (event: WebViewMessageEvent) => {
@@ -65,6 +73,14 @@ export function useWebViewMessage({
             await executeVibration(vibrationType);
             break;
 
+          case Message.SET_STATUS_BAR_STYLE: {
+            const statusBarStyle = data.data?.style;
+            if (isBridgeStatusBarStyle(statusBarStyle)) {
+              setStatusBarStyle(statusBarStyle);
+            }
+            break;
+          }
+
           default:
             console.info("MESSAGE from WebView", data);
             break;
@@ -74,7 +90,7 @@ export function useWebViewMessage({
         console.error("Failed to process WebView message:", error);
       }
     },
-    [address, disconnectWallet, handleConnectRequest, postMessage]
+    [address, disconnectWallet, handleConnectRequest, postMessage, setStatusBarStyle]
   );
 
   return { handleMessage };
