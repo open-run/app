@@ -15,6 +15,8 @@ interface UseWebViewMessageProps {
   address: string | undefined;
   disconnectWallet: () => void;
   handleConnectRequest: () => void;
+  handleSignatureRequest: (payload: { address?: string; message?: string; nonce?: string }) => Promise<void>;
+  isTrustedWebViewMessageUrl: (url?: string) => boolean;
   postMessage: (message: any) => void;
   setStatusBarStyle: (style: BridgeStatusBarStyle) => void;
 }
@@ -26,6 +28,8 @@ export function useWebViewMessage({
   address,
   disconnectWallet,
   handleConnectRequest,
+  handleSignatureRequest,
+  isTrustedWebViewMessageUrl,
   postMessage,
   setStatusBarStyle,
 }: UseWebViewMessageProps) {
@@ -44,6 +48,18 @@ export function useWebViewMessage({
           case Message.REQUEST_SMART_WALLET_CONNECT:
             log("REQUEST_SMART_WALLET_CONNECT");
             handleConnectRequest();
+            break;
+
+          case Message.REQUEST_SMART_WALLET_SIGNATURE:
+            log("REQUEST_SMART_WALLET_SIGNATURE");
+            if (!isTrustedWebViewMessageUrl(event.nativeEvent.url)) {
+              postMessage({
+                type: Message.RESPONSE_SMART_WALLET_SIGNATURE_ERROR,
+                data: "Untrusted WebView origin",
+              });
+              break;
+            }
+            await handleSignatureRequest(data.data ?? {});
             break;
 
           /* 스마트월렛 연결 해제 */
@@ -90,7 +106,15 @@ export function useWebViewMessage({
         console.error("Failed to process WebView message:", error);
       }
     },
-    [address, disconnectWallet, handleConnectRequest, postMessage, setStatusBarStyle]
+    [
+      address,
+      disconnectWallet,
+      handleConnectRequest,
+      handleSignatureRequest,
+      isTrustedWebViewMessageUrl,
+      postMessage,
+      setStatusBarStyle,
+    ]
   );
 
   return { handleMessage };

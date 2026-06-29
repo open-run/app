@@ -4,6 +4,7 @@ import { useSmartWallet } from "./useSmartWallet";
 import { useAppStateListener } from "./useAppStateListener";
 import { Message } from "@constants/message";
 import { log } from "@utils/log";
+import { isOpenRunLoginMessage } from "@utils/openRunLoginMessage";
 
 const MAX_RETRY_COUNT = 2; // 최대 재시도 횟수
 
@@ -15,7 +16,7 @@ interface UseWalletConnectionProps {
  * 지갑 연결, 재시도, 모달 관리 로직을 담당하는 훅
  */
 export function useWalletConnection({ postMessage }: UseWalletConnectionProps) {
-  const { address, connectWallet, closeWallet, isConnected } = useSmartWallet();
+  const { address, connectWallet, closeWallet, isConnected, signMessage } = useSmartWallet();
   const { isOpen } = useAppKitState();
   const { appWentToBackgroundRef, reset: resetAppState } = useAppStateListener(isOpen);
 
@@ -160,9 +161,50 @@ export function useWalletConnection({ postMessage }: UseWalletConnectionProps) {
     });
   };
 
+  const handleSignatureRequest = useCallback(
+    async ({
+      address: requestedAddress,
+      message,
+      nonce,
+    }: {
+      address?: string;
+      message?: string;
+      nonce?: string;
+    }) => {
+      try {
+        if (!address || !requestedAddress || address.toLowerCase() !== requestedAddress.toLowerCase()) {
+          throw new Error("Wallet address mismatch");
+        }
+        if (!message || !nonce) {
+          throw new Error("Signature request is missing message or nonce");
+        }
+        if (!isOpenRunLoginMessage({ message, nonce, address: requestedAddress })) {
+          throw new Error("Invalid OpenRun login message");
+        }
+
+        const signature = await signMessage(message);
+        postMessage({
+          type: Message.RESPONSE_SMART_WALLET_SIGNATURE,
+          data: {
+            address,
+            nonce,
+            signature,
+          },
+        });
+      } catch (error) {
+        postMessage({
+          type: Message.RESPONSE_SMART_WALLET_SIGNATURE_ERROR,
+          data: error instanceof Error ? error.message : "Failed to sign message",
+        });
+      }
+    },
+    [address, postMessage, signMessage]
+  );
+
   return {
     address,
     handleConnectRequest,
+    handleSignatureRequest,
     pendingConnectRef,
   };
 }

@@ -8,6 +8,7 @@ import { useWebViewMessage } from "@hooks/useWebViewMessage";
 import { useWebViewInsets } from "@hooks/useWebViewInsets";
 import { URL as WEB_APP_URL } from "@constants/index";
 import { log } from "@utils/log";
+import { isAllowedWebViewNavigationUrl, isTrustedWebViewMessageUrl } from "@utils/webViewTrust";
 
 type WebStatusBarStyle = Extract<StatusBarStyle, "light" | "dark">;
 
@@ -22,11 +23,13 @@ export default function HomeScreen() {
     webViewRef.current?.postMessage(JSON.stringify(message));
   };
 
-  const { address, handleConnectRequest } = useWalletConnection({ postMessage });
+  const { address, handleConnectRequest, handleSignatureRequest } = useWalletConnection({ postMessage });
   const { handleMessage } = useWebViewMessage({
     address,
     disconnectWallet,
     handleConnectRequest,
+    handleSignatureRequest,
+    isTrustedWebViewMessageUrl,
     postMessage,
     setStatusBarStyle,
   });
@@ -77,7 +80,10 @@ export default function HomeScreen() {
         source={{ uri: WEB_APP_URL }}
         geolocationEnabled
         originWhitelist={["*"]}
+        onShouldStartLoadWithRequest={(request) => isAllowedWebViewNavigationUrl(request.url)}
         mixedContentMode="always"
+        sharedCookiesEnabled
+        thirdPartyCookiesEnabled
         onMessage={handleMessage}
         onLoadEnd={onWebViewLoadEnd}
         onNavigationStateChange={onNavigationStateChange}

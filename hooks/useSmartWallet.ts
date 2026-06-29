@@ -1,9 +1,10 @@
 import { useCallback } from "react";
 import { useAppKit, useAccount } from "@reown/appkit-react-native";
+import { ConnectionsController } from "@reown/appkit-core-react-native";
 
 export function useSmartWallet() {
   const { open, close, disconnect } = useAppKit();
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, chainId } = useAccount();
 
   const connectWallet = useCallback(
     ({
@@ -36,5 +37,24 @@ export function useSmartWallet() {
     disconnect();
   }, [disconnect]);
 
-  return { address, connectWallet, closeWallet, disconnectWallet, isConnected };
+  const signMessage = useCallback(
+    async (message: string) => {
+      if (!address || chainId == null) {
+        throw new Error("Wallet is not connected");
+      }
+
+      const signature = await ConnectionsController.signMessage(
+        `eip155:${chainId}:${address}`,
+        message
+      );
+      if (!signature) {
+        throw new Error("Failed to sign message");
+      }
+
+      return signature;
+    },
+    [address, chainId]
+  );
+
+  return { address, connectWallet, closeWallet, disconnectWallet, isConnected, signMessage };
 }
