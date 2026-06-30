@@ -33,8 +33,12 @@ export function useSmartWallet() {
     }
   }, [close]);
 
-  const disconnectWallet = useCallback(() => {
-    disconnect();
+  const disconnectWallet = useCallback(async () => {
+    try {
+      await disconnect();
+    } catch (error) {
+      console.error("Failed to disconnect wallet:", error);
+    }
   }, [disconnect]);
 
   const signMessage = useCallback(

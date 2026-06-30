@@ -5,6 +5,11 @@ import { useAppStateListener } from "./useAppStateListener";
 import { Message } from "@constants/message";
 import { log } from "@utils/log";
 import { isOpenRunLoginMessage } from "@utils/openRunLoginMessage";
+import {
+  getWalletConnectSessionErrorMessage,
+  isRecoverableWalletConnectSessionError,
+  recoverWalletConnectSession,
+} from "@utils/walletConnectSessionRecovery";
 
 const MAX_RETRY_COUNT = 2; // 최대 재시도 횟수
 
@@ -16,7 +21,7 @@ interface UseWalletConnectionProps {
  * 지갑 연결, 재시도, 모달 관리 로직을 담당하는 훅
  */
 export function useWalletConnection({ postMessage }: UseWalletConnectionProps) {
-  const { address, connectWallet, closeWallet, isConnected, signMessage } = useSmartWallet();
+  const { address, connectWallet, closeWallet, disconnectWallet, isConnected, signMessage } = useSmartWallet();
   const { isOpen } = useAppKitState();
   const { appWentToBackgroundRef, reset: resetAppState } = useAppStateListener(isOpen);
 
@@ -42,6 +47,30 @@ export function useWalletConnection({ postMessage }: UseWalletConnectionProps) {
       }
     },
     [isOpen, closeWallet, resetAppState, postMessage]
+  );
+
+  const handleConnectionError = useCallback(
+    async (error: Error) => {
+      if (isRecoverableWalletConnectSessionError(error)) {
+        await disconnectWallet();
+      }
+
+      const recovered = await recoverWalletConnectSession(error);
+
+      pendingConnectRef.current = false;
+      retryCountRef.current = 0;
+      resetAppState();
+
+      if (recovered && isOpen) {
+        closeWallet();
+      }
+
+      postMessage({
+        type: Message.RESPONSE_SMART_WALLET_CONNECT_ERROR,
+        data: getWalletConnectSessionErrorMessage(error, recovered),
+      });
+    },
+    [closeWallet, disconnectWallet, isOpen, postMessage, resetAppState]
   );
 
   // 모달 열림/닫힘 감지 및 자동 재시도 로직
@@ -89,14 +118,11 @@ export function useWalletConnection({ postMessage }: UseWalletConnectionProps) {
                 },
                 onError: (error) => {
                   log("❌ [Native] 자동 재시도 실패:", error.message);
-                  if (retryCountRef.current >= MAX_RETRY_COUNT) {
-                    pendingConnectRef.current = false;
-                    retryCountRef.current = 0;
-                    resetAppState();
-                    postMessage({
-                      type: Message.RESPONSE_SMART_WALLET_CONNECT_ERROR,
-                      data: error.message,
-                    });
+                  if (
+                    isRecoverableWalletConnectSessionError(error) ||
+                    retryCountRef.current >= MAX_RETRY_COUNT
+                  ) {
+                    void handleConnectionError(error);
                   }
                 },
               });
@@ -124,7 +150,7 @@ export function useWalletConnection({ postMessage }: UseWalletConnectionProps) {
         clearTimeout(timeoutId);
       }
     };
-  }, [isOpen, address, connectWallet, closeWallet, handleConnectionSuccess, resetAppState, postMessage]);
+  }, [isOpen, address, connectWallet, closeWallet, handleConnectionSuccess, handleConnectionError, resetAppState, postMessage]);
 
   // 연결 상태 변경 감지 (주소가 변경되면 연결 성공으로 간주)
   useEffect(() => {
@@ -151,12 +177,7 @@ export function useWalletConnection({ postMessage }: UseWalletConnectionProps) {
         handleConnectionSuccess(address);
       },
       onError: (error) => {
-        pendingConnectRef.current = false;
-        retryCountRef.current = 0;
-        postMessage({
-          type: Message.RESPONSE_SMART_WALLET_CONNECT_ERROR,
-          data: error.message,
-        });
+        void handleConnectionError(error);
       },
     });
   };
