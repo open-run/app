@@ -13,14 +13,6 @@ export function isAllowedWebViewNavigationUrl(url?: string) {
   return hasTrustedOpenRunOrigin(url);
 }
 
-export function isTrustedWebViewMessageUrl(url?: string) {
-  if (!url || url === "about:blank") {
-    return false;
-  }
-
-  return hasTrustedOpenRunOrigin(url);
-}
-
 function hasTrustedOpenRunOrigin(url: string) {
   try {
     return trustedOpenRunOrigins.has(new URL(url).origin);
