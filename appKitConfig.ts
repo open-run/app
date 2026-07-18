@@ -81,11 +81,11 @@ export const appKit = createAppKit({
   metadata: {
     name: "Open Run",
     description: "Open Run App",
-    url: "https://open-run.vercel.app",
+    url: "https://open-run.xyz",
     icons: [],
     redirect: {
       native: PREFIX_URL,
-      universal: "https://open-run.vercel.app",
+      universal: "https://open-run.xyz",
     },
   },
 });
