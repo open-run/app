@@ -1,5 +1,6 @@
 import React, { useCallback, useRef, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import * as Application from "expo-application";
 import WebView from "react-native-webview";
 import { StatusBar, type StatusBarStyle } from "expo-status-bar";
 import { useSmartWallet } from "@hooks/useSmartWallet";
@@ -11,6 +12,13 @@ import { log } from "@utils/log";
 import { isAllowedWebViewNavigationUrl } from "@utils/webViewTrust";
 
 type WebStatusBarStyle = Extract<StatusBarStyle, "light" | "dark">;
+
+// 웹뷰 UA 끝에 붙는 앱 식별 토큰. 웹(frontend)은 이 토큰으로 앱 여부를 판별한다
+// (frontend/apps/web/src/contexts/AppEnvProvider.tsx의 APP_UA_TOKEN과 맞춰야 함)
+// iOS는 이 값이 기본 세그먼트 "Mobile/15E148"을 대체하므로, UA 기반 모바일 판별을 하는
+// 서드파티가 오분류하지 않도록 기본 세그먼트를 함께 유지한다 (Android는 끝에 추가만 됨)
+const APP_UA_TOKEN = `OpenRunApp/${Application.nativeApplicationVersion ?? "0.0.0"}`;
+const APP_USER_AGENT = Platform.OS === "ios" ? `Mobile/15E148 ${APP_UA_TOKEN}` : APP_UA_TOKEN;
 
 export default function HomeScreen() {
   const { disconnectWallet } = useSmartWallet();
@@ -76,6 +84,7 @@ export default function HomeScreen() {
         key={WEB_APP_URL}
         ref={webViewRef}
         source={{ uri: WEB_APP_URL }}
+        applicationNameForUserAgent={APP_USER_AGENT}
         geolocationEnabled
         originWhitelist={["*"]}
         onShouldStartLoadWithRequest={(request) => isAllowedWebViewNavigationUrl(request.url)}
